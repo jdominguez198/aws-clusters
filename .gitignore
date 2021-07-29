@@ -12,3 +12,6 @@ gen
 *.tfstate
 *.tfstate.*
 *.tfplan
+
+# WIP Testing
+eks-cluster/manifests-test
