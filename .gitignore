@@ -1,5 +1,14 @@
+.DS_Store
+
 # IntelliJ project files
 .idea
 *.iml
 out
 gen
+
+# Terraform files
+**/.terraform/*
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
