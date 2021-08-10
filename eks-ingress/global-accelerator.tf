@@ -2,6 +2,17 @@ data "aws_globalaccelerator_accelerator" "ga_static_ip" {
   name = var.GA_NAME
 }
 
+data "aws_lb" "aws_lb_ingress" {
+  tags = {
+    "kubernetes.io/ingress-name" = "alb-ingress"
+    "kubernetes.io/cluster/${var.EKS_CLUSTER_NAME}" = "owned"
+  }
+
+  depends_on = [
+    kubernetes_ingress.alb-ingress
+  ]
+}
+
 resource "aws_globalaccelerator_listener" "ga_listener" {
   accelerator_arn = data.aws_globalaccelerator_accelerator.ga_static_ip.id
   client_affinity = "SOURCE_IP"
@@ -11,16 +22,10 @@ resource "aws_globalaccelerator_listener" "ga_listener" {
     from_port = 443
     to_port   = 443
   }
-}
-
-data "aws_lb" "aws_lb_ingress" {
-  tags = {
-    "kubernetes.io/ingress-name" = "alb-ingress"
-    "kubernetes.io/cluster/${var.EKS_CLUSTER_NAME}" = "owned"
-  }
 
   depends_on = [
-    kubernetes_ingress.alb-ingress
+    kubernetes_ingress.alb-ingress,
+    data.aws_lb.aws_lb_ingress
   ]
 }
 

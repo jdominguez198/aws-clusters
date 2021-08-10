@@ -44,7 +44,7 @@ resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
   policy_arn = aws_iam_policy.cluster_autoscaler.0.arn
 
   depends_on = [
-  aws_iam_policy.cluster_autoscaler
-
+    module.iam_iam-assumable-role-with-oidc.this_iam_role_name,
+    aws_iam_policy.cluster_autoscaler
   ]
 }
