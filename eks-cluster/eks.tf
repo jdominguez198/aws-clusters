@@ -1,39 +1,40 @@
-resource "aws_eks_cluster" "aws_eks" {
-  name = "k8s_aws"
-  role_arn = aws_iam_role.eks_cluster.arn
+module "eks" {
+  source = "terraform-aws-modules/eks/aws"
+  cluster_name = var.EKS_CLUSTER_NAME
+  cluster_version = "1.20"
+  subnets = module.vpc.private_subnets
+  vpc_id = module.vpc.vpc_id
+  write_kubeconfig = false
+  enable_irsa = true
+  create_eks = true
 
-  vpc_config {
-    subnet_ids = [ aws_subnet.k8s_eks_subnet_1.id, aws_subnet.k8s_eks_subnet_2.id ]
+  node_groups_defaults = {
+    ami_type  = "AL2_x86_64"
+    disk_size = 20
+  }
+
+  node_groups = {
+    "${var.EKS_CLUSTER_NAME}_node_group_01" = {
+      desired_capacity = 1
+      min_capacity = 1
+      max_capacity = 10
+      instance_types = [local.vpc_node_group_instance_type.01]
+      eni_delete = true
+
+//      k8s_labels = {
+//        "kubernetes.io/cluster/${var.EKS_CLUSTER_NAME}"     = "owned"
+//        "k8s.io/cluster-autoscaler/${var.EKS_CLUSTER_NAME}" = "owned"
+//        "k8s.io/cluster-autoscaler/enabled"                 = "true"
+//      }
+
+      additional_tags = {
+        "k8s.io/cluster-autoscaler/${var.EKS_CLUSTER_NAME}" = "owned"
+        "k8s.io/cluster-autoscaler/enabled" = "true"
+      }
+    }
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.AmazonEKSWorkerNodePolicy,
-    aws_iam_role_policy_attachment.AmazonEKS_CNI_Policy,
-    aws_iam_role_policy_attachment.AmazonEC2ContainerRegistryReadOnly,
-  ]
-
-  tags = {
-    Name = "k8s_aws_test"
-  }
-}
-
-resource "aws_eks_node_group" "node" {
-  cluster_name = aws_eks_cluster.aws_eks.name
-  node_group_name = "k8s_aws_nodes"
-  node_role_arn = aws_iam_role.eks_nodes.arn
-  subnet_ids = [ aws_subnet.k8s_eks_subnet_1.id, aws_subnet.k8s_eks_subnet_2.id ]
-
-  instance_types = ["t2.micro"]
-
-  scaling_config {
-    desired_size = 3
-    max_size = 3
-    min_size = 3
-  }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.AmazonEKSWorkerNodePolicy,
-    aws_iam_role_policy_attachment.AmazonEKS_CNI_Policy,
-    aws_iam_role_policy_attachment.AmazonEC2ContainerRegistryReadOnly,
+    module.vpc.nat_ids
   ]
 }

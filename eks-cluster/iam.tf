@@ -1,60 +1,50 @@
-resource "aws_iam_role" "eks_cluster" {
-  name = "eks-cluster"
-  assume_role_policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "eks.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
+
+module "iam_iam-assumable-role-with-oidc" {
+  source                = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+  version               = "3.6.0"
+  aws_account_id        = var.AWS_ACCOUNT_ID
+  role_name             = local.openid_connect_role_name
+  create_role           = true
+  force_detach_policies = true
+  provider_url          = module.eks.cluster_oidc_issuer_url
+  role_policy_arns      = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"]
+}
+
+resource "aws_iam_policy" "load-balancer-policy" {
+  name = "AWSLoadBalancerControllerIAMPolicy"
+  path = "/"
+  description = "AWS LoadBalancer Controller IAM Policy"
+  policy = file("./iam/iam-load-balancer-policy.json")
+}
+
+resource "aws_iam_role_policy_attachment" "AmazonLoadBalancer" {
+  policy_arn = "arn:aws:iam::${var.AWS_ACCOUNT_ID}:policy/AWSLoadBalancerControllerIAMPolicy"
+  role = module.eks.cluster_iam_role_name
+}
+
+resource "aws_iam_role_policy_attachment" "alb-ingress-controller-role-policy" {
+  policy_arn = aws_iam_policy.load-balancer-policy.arn
+  role = module.iam_iam-assumable-role-with-oidc.this_iam_role_name
+}
+
+resource "aws_iam_policy" "cluster_autoscaler" {
+  count = 1
+
+  name = "KubernetesClusterAutoscaler"
+  path = "/"
+  description = "Allows access to resources needed to run kubernetes cluster autoscaler."
+
+  policy = file("./iam/iam-autoscaler-policy.json")
+}
+
+resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
+  count = 1
+
+  role = local.openid_connect_role_name
+  policy_arn = aws_iam_policy.cluster_autoscaler.0.arn
+
+  depends_on = [
+  aws_iam_policy.cluster_autoscaler
+
   ]
-}
-POLICY
-}
-
-resource "aws_iam_role_policy_attachment" "AmazonEKSClusterPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role = aws_iam_role.eks_cluster.name
-}
-
-resource "aws_iam_role_policy_attachment" "AmazonEKSServicePolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
-  role = aws_iam_role.eks_cluster.name
-}
-
-resource "aws_iam_role" "eks_nodes" {
-  name = "eks-node-group"
-  assume_role_policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-POLICY
-}
-
-resource "aws_iam_role_policy_attachment" "AmazonEKSWorkerNodePolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role = aws_iam_role.eks_nodes.name
-}
-
-resource "aws_iam_role_policy_attachment" "AmazonEKS_CNI_Policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role = aws_iam_role.eks_nodes.name
-}
-
-resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role = aws_iam_role.eks_nodes.name
 }

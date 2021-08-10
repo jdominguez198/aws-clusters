@@ -1,61 +1,36 @@
-resource "aws_vpc" "k8s_eks_vpc" {
-  cidr_block = var.NET_CIDR_BLOCK
+//variable "region" {
+//  default = "eu-west-1"
+//  description = "AWS region"
+//}
+
+data "aws_availability_zones" "available" {}
+
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
+  version = "~> 2.47"
+
+  name = "${var.EKS_CLUSTER_NAME}_vpc"
+  cidr = local.subnet_gateway_cidr_block
+  azs = data.aws_availability_zones.available.names
+  private_subnets = [ local.subnets.01.private_cidr_block, local.subnets.02.private_cidr_block ]
+  public_subnets = [ local.subnets.01.public_cidr_block, local.subnets.02.public_cidr_block ]
+  enable_nat_gateway = true
+  single_nat_gateway = true
   enable_dns_hostnames = true
-  enable_dns_support =  true
 
   tags = {
-    Name = "default"
-  }
-}
-
-resource "aws_internet_gateway" "k8s_eks_gateway" {
-  vpc_id = aws_vpc.k8s_eks_vpc.id
-  tags = {
-    Name = "default"
-  }
-}
-
-resource "aws_route_table" "k8s_eks_route" {
-  vpc_id = aws_vpc.k8s_eks_vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.k8s_eks_gateway.id
+    "kubernetes.io/cluster/${var.EKS_CLUSTER_NAME}" = "shared"
   }
 
-  tags = {
-    Name = "default"
+  public_subnet_tags = {
+    Application = "kubernetes",
+    "kubernetes.io/cluster/${var.EKS_CLUSTER_NAME}" = "shared"
+    "kubernetes.io/role/elb" = "1"
   }
-}
 
-resource "aws_subnet" "k8s_eks_subnet_1" {
-  vpc_id = aws_vpc.k8s_eks_vpc.id
-  cidr_block = var.SUBNET_CIDR_BLOCK_01
-  availability_zone = var.ZONE_SUBNET_01
-  map_public_ip_on_launch = true
-
-  depends_on = [
-    aws_internet_gateway.k8s_eks_gateway
-  ]
-}
-
-resource "aws_subnet" "k8s_eks_subnet_2" {
-  vpc_id = aws_vpc.k8s_eks_vpc.id
-  cidr_block = var.SUBNET_CIDR_BLOCK_02
-  availability_zone = var.ZONE_SUBNET_02
-  map_public_ip_on_launch = true
-
-  depends_on = [
-    aws_internet_gateway.k8s_eks_gateway
-  ]
-}
-
-resource "aws_route_table_association" "k8s_eks_subnet_1_association" {
-  subnet_id      = aws_subnet.k8s_eks_subnet_1.id
-  route_table_id = aws_route_table.k8s_eks_route.id
-}
-
-resource "aws_route_table_association" "k8s_eks_subnet_2_association" {
-  subnet_id      = aws_subnet.k8s_eks_subnet_2.id
-  route_table_id = aws_route_table.k8s_eks_route.id
+  private_subnet_tags = {
+    Application = "kubernetes",
+    "kubernetes.io/cluster/${var.EKS_CLUSTER_NAME}" = "shared"
+    "kubernetes.io/role/internal-elb" = "1"
+  }
 }

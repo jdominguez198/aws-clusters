@@ -1,23 +1,23 @@
-variable "NET_CIDR_BLOCK" {
+variable "AWS_ACCOUNT_ID" {
   default = ""
 }
 
-variable "SUBNET_CIDR_BLOCK_01" {
-  default = ""
-}
-
-variable "SUBNET_CIDR_BLOCK_02" {
-  default = ""
+variable "EKS_CLUSTER_NAME" {
+  default = "k8s_aws"
 }
 
 variable "ZONE" {
-  default = ""
+  default = "eu-west-1"
 }
 
 variable "ZONE_SUBNET_01" {
-  default = ""
+  default = "eu-west-1a"
 }
 
 variable "ZONE_SUBNET_02" {
-  default = ""
+  default = "eu-west-1b"
+}
+
+variable "ZONE_SUBNET_03" {
+  default = "eu-west-1c"
 }

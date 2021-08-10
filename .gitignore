@@ -12,6 +12,7 @@ gen
 *.tfstate
 *.tfstate.*
 *.tfplan
+terraform.tfvars
 
 # WIP Testing
 eks-cluster/manifests-test

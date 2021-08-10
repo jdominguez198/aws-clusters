@@ -1,12 +1,15 @@
-# EKS Cluster
+# EKS Ingress
 
 ## Introduction
 
-Create a EKS cluster in AWS using Terraform
+Create the Load Balancer (Ingress) for EKS Cluster in AWS using Terraform
 
 ## Prerequisites
 
 - Non-root AWS user with enough credentials
+- [EKS Cluster](../eks-cluster) up and working
+- You should have an Accelerator created in Global Accelerator service first. Then
+use the name of the Accelerator to set the Terraform variable `GA_NAME`.
 
 ## Getting Started
 
@@ -15,9 +18,12 @@ Create a EKS cluster in AWS using Terraform
 Copy the file `terraform.tfvars.sample` into a new file named `terraform.tfvars` and set
 the following variables:
 
-- `AWS_ACCOUNT_ID` => Account ID of the AWS user
-- `EKS_CLUSTER_NAME` => Name of the EKS cluster
-
+- `GA_NAME` => Accelerator name from Global Accelerator service (created as prerequisite)
+- `INGRESS_BACKEND_SERVICE_NAME` => Name of the default backend service where the Load Balancer will
+  point to listen
+- `INGRESS_BACKEND_SERVICE_PORT` => Port of the default backend service where the Load Balancer will
+  point to listen
+  
 ### Initialize Terraform
 
 You should initialize Terraform on this folder to download all requirements for the library. You should type
