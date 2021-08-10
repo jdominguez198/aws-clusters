@@ -9,8 +9,18 @@ data "aws_lb" "aws_lb_ingress" {
   }
 
   depends_on = [
+    time_sleep.wait_for_lb
+  ]
+}
+
+// Workaround to avoid data.aws_lb fail immediately after create the alb-ingress
+// https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep
+resource "time_sleep" "wait_for_lb" {
+  depends_on = [
     kubernetes_ingress.alb-ingress
   ]
+
+  create_duration = "5s"
 }
 
 resource "aws_globalaccelerator_listener" "ga_listener" {
