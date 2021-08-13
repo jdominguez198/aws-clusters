@@ -263,4 +263,8 @@ resource "kubernetes_deployment" "cluster_autoscaler" {
       }
     }
   }
+
+  depends_on = [
+    module.eks.node_groups
+  ]
 }

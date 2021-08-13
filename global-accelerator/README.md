@@ -1,15 +1,14 @@
-# EKS Ingress
+# Global Accelerator
 
 ## Introduction
 
-Create the Load Balancer (Ingress) for EKS Cluster in AWS using Terraform
+Create a Global Static IP set using Global Accelerator service.
+
+This IP can be assigned to a Load Balancer, or directly to a EC2 instance.
 
 ## Prerequisites
 
 - Non-root AWS user with enough credentials
-- [EKS Cluster](../eks-cluster) up and working
-- You should have an Accelerator created in Global Accelerator service first. Then
-use the name of the Accelerator to set the Terraform variable `GA_NAME`.
 
 ## Getting Started
 
@@ -18,11 +17,7 @@ use the name of the Accelerator to set the Terraform variable `GA_NAME`.
 Copy the file `terraform.tfvars.sample` into a new file named `terraform.tfvars` and set
 the following variables:
 
-- `GA_NAME` => Accelerator name from Global Accelerator service (created as prerequisite)
-- `INGRESS_BACKEND_SERVICE_NAME` => Name of the default backend service where the Load Balancer will
-  point to listen
-- `INGRESS_BACKEND_SERVICE_PORT` => Port of the default backend service where the Load Balancer will
-  point to listen
+- `GA_NAME` => Accelerator name for Global Accelerator service
   
 ### Initialize Terraform
 
@@ -55,12 +50,11 @@ It will ask you to confirm to perform all the operations. Type `yes` when you're
 
 ## Cleanup
 
-If you want to delete the Ingress, Certificates and GA endpoints, you can do it using
-Terraform too. Just type the following command:
+If you want to delete the Global Accelerator, you can do it using Terraform too. Just type the following command:
 
 ```
 terraform destroy
 ```
 
-You will be prompted to confirm the delete operations. Take in mind that this will remove the ingress
-and the certificates, so you should be sure to do it before you type `yes`.
+You will be prompted to confirm the delete operations. Take in mind that this will remove the IP set generated,
+so you should be sure to do it before you type `yes`.

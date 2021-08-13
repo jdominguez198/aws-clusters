@@ -1,5 +1,5 @@
 variable "GA_NAME" {
-  default = "k8s_aws_ga_ip"
+  default = "k8s-aws-ga-ip"
 }
 
 variable "ZONE" {

@@ -18,15 +18,20 @@ with the following services:
 - AWS-CLI
 - Terraform
 - kubectl
-- Accelerator created without listeners in Global Accelerator service
-- TLS certificates (key, crt, and ca)
+- TLS certificates (`ssl_key`, `ssl_body`, and `ssl_chain`) under [eks-ingress/certificates](eks-ingress/certificates)
+folder.
 
 ## Getting started
 
 1. Follow the documentation in [eks-cluster](eks-cluster) folder to create the EKS Cluster with
-the required policies, roles and resources to start using k8s
-2. Follow the documentation in [eks-ingress](eks-ingress) folder to create the Load Balancer
-with the TLS certificates and the Static IP assigned from Global Accelerator service
+   the required policies, roles and resources to start using k8s
+2. [OPTIONAL] Follow the documentation in [global-accelerator](global-accelerator) folder to create
+   the Static IP using the Global Accelerator Service, if you already didn't have it
+3. Follow the documentation in [eks-ingress](eks-ingress) folder to create the Load Balancer
+   with the TLS certificates and the Static IP assigned from Global Accelerator service
+
+NOTE: You can create all the `terraform.tfvars` (file with variables used for all operations) needed
+by using `make initialize` in the root folder.
 
 ## Resources
 

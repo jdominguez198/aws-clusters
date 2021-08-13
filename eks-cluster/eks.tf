@@ -14,7 +14,7 @@ module "eks" {
   }
 
   node_groups = {
-    "${var.EKS_CLUSTER_NAME}_node_group_01" = {
+    "${var.EKS_CLUSTER_NAME}_ng_01" = {
       desired_capacity = 1
       min_capacity = 1
       max_capacity = 10
