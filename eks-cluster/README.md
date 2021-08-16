@@ -15,7 +15,6 @@ Create a EKS cluster in AWS using Terraform
 Copy the file `terraform.tfvars.sample` into a new file named `terraform.tfvars` and set
 the following variables:
 
-- `AWS_ACCOUNT_ID` => Account ID of the AWS user
 - `EKS_CLUSTER_NAME` => Name of the EKS cluster
 
 ### Initialize Terraform

@@ -15,17 +15,11 @@ module "eks" {
 
   node_groups = {
     "${var.EKS_CLUSTER_NAME}_ng_01" = {
-      desired_capacity = 1
-      min_capacity = 1
-      max_capacity = 10
+      desired_capacity = local.eks_node_group_min
+      min_capacity = local.eks_node_group_min
+      max_capacity = local.eks_node_group_max
       instance_types = [local.vpc_node_group_instance_type.01]
       eni_delete = true
-
-//      k8s_labels = {
-//        "kubernetes.io/cluster/${var.EKS_CLUSTER_NAME}"     = "owned"
-//        "k8s.io/cluster-autoscaler/${var.EKS_CLUSTER_NAME}" = "owned"
-//        "k8s.io/cluster-autoscaler/enabled"                 = "true"
-//      }
 
       additional_tags = {
         "k8s.io/cluster-autoscaler/${var.EKS_CLUSTER_NAME}" = "owned"

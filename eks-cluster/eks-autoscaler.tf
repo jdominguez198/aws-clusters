@@ -1,15 +1,16 @@
 
 resource "kubernetes_service_account" "cluster_autoscaler" {
   metadata {
-    name = "eks-cluster-autoscaler"
+    name = "cluster-autoscaler"
     namespace = "kube-system"
 
     annotations = {
-      "eks.amazonaws.com/role-arn" = "arn:aws:iam::${var.AWS_ACCOUNT_ID}:role/${local.openid_connect_role_name}"
+      "eks.amazonaws.com/role-arn" = module.iam_iam-assumable-role-with-oidc.this_iam_role_arn
     }
 
     labels = {
       k8s-addon = "cluster-autoscaler.addons.k8s.io",
+      k8s-app = "cluster-autoscaler"
     }
   }
 
@@ -20,9 +21,10 @@ resource "kubernetes_service_account" "cluster_autoscaler" {
 
 resource "kubernetes_cluster_role" "cluster_autoscaler" {
   metadata {
-    name = "eks-cluster-autoscaler"
+    name = "cluster-autoscaler"
     labels = {
       k8s-addon = "cluster-autoscaler.addons.k8s.io",
+      k8s-app = "cluster-autoscaler"
     }
   }
 
@@ -92,11 +94,13 @@ resource "kubernetes_cluster_role" "cluster_autoscaler" {
     resources = ["jobs"]
     verbs = ["get", "list", "watch", "patch"]
   }
+
   rule {
     api_groups = ["coordination.k8s.io"]
     resources = ["leases"]
     verbs = ["create"]
   }
+
   rule {
     api_groups = ["coordination.k8s.io"]
     resource_names = ["cluster-autoscaler"]
@@ -107,10 +111,11 @@ resource "kubernetes_cluster_role" "cluster_autoscaler" {
 
 resource "kubernetes_role" "cluster_autoscaler" {
   metadata {
-    name = "eks-cluster-autoscaler"
+    name = "cluster-autoscaler"
     namespace = kubernetes_service_account.cluster_autoscaler.metadata.0.namespace
     labels = {
       k8s-addon = "cluster-autoscaler.addons.k8s.io",
+      k8s-app = "cluster-autoscaler"
     }
   }
 
@@ -130,9 +135,10 @@ resource "kubernetes_role" "cluster_autoscaler" {
 
 resource "kubernetes_cluster_role_binding" "cluster_autoscaler" {
   metadata {
-    name = "eks-cluster-autoscaler"
+    name = "cluster-autoscaler"
     labels = {
       k8s-addon = "cluster-autoscaler.addons.k8s.io",
+      k8s-app = "cluster-autoscaler"
     }
   }
 
@@ -151,10 +157,11 @@ resource "kubernetes_cluster_role_binding" "cluster_autoscaler" {
 
 resource "kubernetes_role_binding" "cluster_autoscaler" {
   metadata {
-    name = "eks-cluster-autoscaler"
+    name = "cluster-autoscaler"
     namespace = kubernetes_service_account.cluster_autoscaler.metadata.0.namespace
     labels = {
       k8s-addon = "cluster-autoscaler.addons.k8s.io",
+      k8s-app = "cluster-autoscaler"
     }
   }
 
@@ -173,10 +180,11 @@ resource "kubernetes_role_binding" "cluster_autoscaler" {
 
 resource "kubernetes_deployment" "cluster_autoscaler" {
   metadata {
-    name = "eks-cluster-autoscaler"
+    name = "cluster-autoscaler"
     namespace = "kube-system"
     labels = {
-      k8s-addon = "cluster-autoscaler.addons.k8s.io",
+      "app.kubernetes.io/name" = "cluster-autoscaler"
+      "app" = "cluster-autoscaler"
     }
   }
 
@@ -185,36 +193,39 @@ resource "kubernetes_deployment" "cluster_autoscaler" {
 
     selector {
       match_labels = {
-        "app.kubernetes.io/name" = "alb-ingress-controller"
+        "app.kubernetes.io/name" = "cluster-autoscaler"
+        "app" = "cluster-autoscaler"
       }
     }
 
     template {
       metadata {
         labels = {
-          "app.kubernetes.io/name" = "alb-ingress-controller"
-          k8s-addon = "cluster-autoscaler.addons.k8s.io",
+          "app.kubernetes.io/name" = "cluster-autoscaler"
+          "app" = "cluster-autoscaler"
         }
-        annotations = {}
+        annotations = {
+          "prometheus.io/scrape" = true
+          "prometheus.io/port" = 8085
+        }
       }
 
       spec {
         service_account_name = kubernetes_service_account.cluster_autoscaler.metadata.0.name
-
         priority_class_name = null
 
         container {
-          image = "k8s.gcr.io/autoscaling/cluster-autoscaler:v1.18.3"
+          image = "k8s.gcr.io/autoscaling/cluster-autoscaler:v1.22.0"
           name = "cluster-autoscaler"
 
-          resources{
+          resources {
             limits =  {
               cpu = "100m"
-              memory = "512Mi"
+              memory = "600Mi"
             }
             requests = {
               cpu = "100m"
-              memory = "512Mi"
+              memory = "600Mi"
             }
           }
 
@@ -258,8 +269,6 @@ resource "kubernetes_deployment" "cluster_autoscaler" {
             secret_name = kubernetes_service_account.cluster_autoscaler.default_secret_name
           }
         }
-
-        node_selector = {}
       }
     }
   }

@@ -1,24 +1,29 @@
 locals {
   subnets = {
     01 = {
-      private_cidr_block = "172.16.1.0/24"
-      public_cidr_block = "172.16.10.0/24"
+      private_cidr_block = "172.16.0.0/20"
+      public_cidr_block = "172.16.96.0/20"
     }
     02 = {
-      private_cidr_block = "172.16.2.0/24"
-      public_cidr_block = "172.16.11.0/24"
+      private_cidr_block = "172.16.16.0/20"
+      public_cidr_block = "172.16.112.0/20"
     }
     03 = {
-      private_cidr_block = "172.16.3.0/24"
-      public_cidr_block = "172.16.12.0/24"
+      private_cidr_block = "172.16.32.0/20"
+      public_cidr_block = "172.16.132.0/20"
     }
   }
 
   subnet_gateway_cidr_block = "172.16.0.0/16"
 
   vpc_node_group_instance_type = {
-    01 = "t3.medium"
+    01 = "t3.small"
   }
 
-  openid_connect_role_name = "S3-Readonly-OIDC-Role"
+  eks_node_group_min = 1
+  eks_node_group_max = 10
+
+  openid_connect_role_name = "OpenIDConnectRole"
+  load_balancer_role_name = "LBControllerIAMPolicy"
+  cluster_autoscaler_role_name = "KubernetesClusterAutoscaler"
 }

@@ -1,5 +1,5 @@
-variable "AWS_ACCOUNT_ID" {
-  default = ""
+variable "PREFIX" {
+  default = "prefix"
 }
 
 variable "EKS_CLUSTER_NAME" {
