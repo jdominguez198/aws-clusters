@@ -1,4 +1,5 @@
 locals {
+  // eks-cluster related
   subnets = {
     01 = {
       private_cidr_block = "172.16.0.0/20"
@@ -26,4 +27,21 @@ locals {
   openid_connect_role_name = "OpenIDConnectRole"
   load_balancer_role_name = "LBControllerIAMPolicy"
   cluster_autoscaler_role_name = "KubernetesClusterAutoscaler"
+
+  // nginx-controller related
+  base_name = "ingress-nginx"
+  service_account_name = "ingress-nginx"
+
+  common_labels = {
+    "app.kubernetes.io/name" = "ingress-nginx"
+    "app.kubernetes.io/instance" = "ingress-nginx"
+  }
+
+  component_controller_labels = {
+    "app.kubernetes.io/component" = "controller"
+  }
+
+  component_admission_webhook_labels = {
+    "app.kubernetes.io/component" = "admission-webhook"
+  }
 }

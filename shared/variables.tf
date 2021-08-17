@@ -1,9 +1,25 @@
-variable "ZONE" {
-  default = "eu-west-1"
+variable "PREFIX" {
+  default = "prefix"
 }
 
 variable "EKS_CLUSTER_NAME" {
   default = "k8s_aws"
+}
+
+variable "ZONE" {
+  default = "eu-west-1"
+}
+
+variable "ZONE_SUBNET_01" {
+  default = "eu-west-1a"
+}
+
+variable "ZONE_SUBNET_02" {
+  default = "eu-west-1b"
+}
+
+variable "ZONE_SUBNET_03" {
+  default = "eu-west-1c"
 }
 
 variable "INGRESS_NAMESPACE" {
@@ -20,4 +36,8 @@ variable "INGRESS_BACKEND_SERVICE_PORT" {
 
 variable "STATIC_IP_NAME" {
   default = "k8s_aws_eip"
+}
+
+variable "GA_NAME" {
+  default = "k8s-aws-ga-ip"
 }
