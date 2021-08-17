@@ -34,10 +34,10 @@ variable "INGRESS_BACKEND_SERVICE_PORT" {
   default = "80"
 }
 
-variable "STATIC_IP_NAME" {
+variable "ELASTIC_IP_NAME" {
   default = "k8s_aws_eip"
 }
 
 variable "GA_NAME" {
-  default = "k8s-aws-ga-ip"
+  default = "k8s_aws_gaip"
 }

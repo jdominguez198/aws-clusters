@@ -1,11 +1,11 @@
 data "aws_eip" "eip-01" {
   tags = {
-    Name = "${var.STATIC_IP_NAME}_01"
+    Name = "${var.ELASTIC_IP_NAME}_01"
   }
 }
 
 data "aws_eip" "eip-02" {
   tags = {
-    Name = "${var.STATIC_IP_NAME}_02"
+    Name = "${var.ELASTIC_IP_NAME}_02"
   }
 }
