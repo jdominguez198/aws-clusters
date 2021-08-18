@@ -11,6 +11,13 @@ This IP can be assigned to a Network Load Balancer, or directly to a EC2 instanc
 - Non-root AWS user with enough credentials
 
 ## Getting Started
+
+### Set Terraform variables
+
+Copy the file `terraform.tfvars.sample` into a new file named `terraform.tfvars` and set
+the following variables:
+
+- `ELASTIC_IP_NAME` => Name for making the Elastic IPs discoverable
  
 ### Initialize Terraform
 

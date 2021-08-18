@@ -28,6 +28,17 @@ module "eks" {
     }
   }
 
+  fargate_profiles = {
+    default = {
+      name = "default"
+      selectors = [
+        {
+          namespace = "default"
+        }
+      ]
+    }
+  }
+
   depends_on = [
     module.vpc.nat_ids
   ]

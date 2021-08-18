@@ -8,8 +8,8 @@ Create the Load Balancer (Ingress) for EKS Cluster in AWS using Terraform
 
 - Non-root AWS user with enough credentials
 - [EKS Cluster](../eks-cluster) up and working
-- You should have a set of Elastic IPs first (you can do it following [Elastic IP](../elastic-ip) instructions. Then
-use the name used to set the Terraform variable `STATIC_IP_NAME`.
+- You should have a set of Elastic IPs first (you can do it following [Elastic IP](../elastic-ip) instructions). Then
+use the name used to set the Terraform variable `ELASTIC_IP_NAME`.
 
 ## Getting Started
 
@@ -18,7 +18,8 @@ use the name used to set the Terraform variable `STATIC_IP_NAME`.
 Copy the file `terraform.tfvars.sample` into a new file named `terraform.tfvars` and set
 the following variables:
 
-- `GA_NAME` => Accelerator name from Global Accelerator service (created as prerequisite)
+- `EKS_CLUSTER_NAME` => Name of the EKS cluster
+- `ELASTIC_IP_NAME` => Name used in Elastic IPs to use them
 - `INGRESS_BACKEND_SERVICE_NAME` => Name of the default backend service where the Load Balancer will
   point to listen
 - `INGRESS_BACKEND_SERVICE_PORT` => Port of the default backend service where the Load Balancer will

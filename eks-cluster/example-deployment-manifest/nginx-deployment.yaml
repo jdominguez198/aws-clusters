@@ -33,11 +33,3 @@ spec:
           initialDelaySeconds: 30
           periodSeconds: 30
           timeoutSeconds: 60
-        volumeMounts:
-        - mountPath: /etc/localtime
-          name: tz-config
-      volumes:
-      - hostPath:
-          path: /usr/share/zoneinfo/Europe/Madrid
-          type: File
-        name: tz-config
