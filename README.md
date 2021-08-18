@@ -8,6 +8,7 @@ with the following services:
 - Cluster using EKS service
 - Node groups with EC2 provisioning
 - AutoScaler to manage horizontal escalation in Node groups
+- Fargate profiles for specific namespaces and/or pods
 - Load Balancer using ALB or NLB
 - TLS certificates for Load Balancer using ACM
 - Global static IP for Application Load Balancer using Global Accelerator
@@ -23,31 +24,27 @@ with the following services:
 
 ## Getting started
 
-1. Follow the documentation in [eks-cluster](eks-cluster) folder to create the EKS Cluster with
+1. Run `make intitialize` to create all the `terraform.tfvars` files with the required variables
+   to operate correctly with each AWS service
+2. Follow the documentation in [eks-cluster](eks-cluster) folder to create the EKS Cluster with
    the required policies, roles and resources to start using k8s
-2. Now you can add a Load Balancer connected to the Cluster on two different ways:
+3. Export `kubeconfig` files to operate with `kubectl` by typing in your terminal:
 
-   - Using a Network Load Balancer + Elastic IPs (x2) + SSL.
-   
-      This option is for sites with a low average connections or for
-      sites with traffic focused on a unique region.
+    ```bash
+    aws eks --region <YOUR_REGION> update-kubeconfig --name <YOUR_EKS_CLUSTER_NAME>
+    ```
 
-      Follow the instructions in [eks-nginx-controller](eks-nginx-controller) folder to create the Network Load Balancer
-      using NGINX Controller and two already created Elastic IPs acting as Static IPs. If you don't have any Elastic IP
-      created, you can create them using the instructions in [elastic-ip](elastic-ip) folder.
-   - Using an Application Load Balancer + Global Accelerator + SSL.
+4. Now you can add a Load Balancer connected to the Cluster and allow external traffic on two different ways:
 
-      This option is for sites with a high average connections or for sites with traffic focused
-      in different regions.
-      
-      Follow the instructions in [eks-alb-controller](eks-alb-controller) folder to create the Application Load Balancer
-      using the native AWS controller with an Accelerator already created using Global Accelerator service, acting as
-      Static IPs. If you don't have any Accelerator created, you can create it using the instructions in
-      [global-accelerator](global-accelerator) folder.
-
-NOTE: You can create all the `terraform.tfvars` (file with variables used for all operations) needed
-by using `make initialize` in the root folder.
-
+   - Using a Network Load Balancer + Elastic IPs (x2) + SSL:
+     - Get your Elastic IPs following the instructions in [elastic-ip](elastic-ip) folder.
+     - Create the Network Load Balancer with NGINX Controller and SSL, following the instructions in
+       [eks-nginx-controller](eks-nginx-controller) folder.
+   - Using an Application Load Balancer + Global Accelerator + SSL:
+     - Get your Accelerator following the instructions in [global-accelerator](global-accelerator) folder.
+     - Create the Application Load Balancer with SSL, following the instructions in
+       [eks-alb-controller](eks-alb-controller) folder.
+     
 ## Resources
 
 - https://github.com/AJarombek/global-aws-infrastructure/blob/master/eks/main.tf
