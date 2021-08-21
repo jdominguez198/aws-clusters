@@ -39,5 +39,5 @@ variable "ELASTIC_IP_NAME" {
 }
 
 variable "GA_NAME" {
-  default = "k8s_aws_gaip"
+  default = "k8s-aws-gaip"
 }
