@@ -142,6 +142,3 @@ clean_vars:
 
 clean: clean_state clean_vars
 	@echo Full cleanup done!
-
-test_prompt: prompt_vars
-	echo $(SHELL_EXPORT)
