@@ -26,15 +26,17 @@ with the following services:
 
 1. Run `make intitialize` to create all the `terraform.tfvars` files with the required variables
    to operate correctly with each AWS service
-2. Follow the documentation in [eks-cluster](eks-cluster) folder to create the EKS Cluster with
+2. Follow the documentation in [s3-backend](s3-backend) folder to create a S3 Bucket to store the
+   Terraform state
+3. Follow the documentation in [eks-cluster](eks-cluster) folder to create the EKS Cluster with
    the required policies, roles and resources to start using k8s
-3. Export `kubeconfig` files to operate with `kubectl` by typing in your terminal:
+4. Export `kubeconfig` files to operate with `kubectl` by typing in your terminal:
 
     ```bash
     aws eks --region <YOUR_REGION> update-kubeconfig --name <YOUR_EKS_CLUSTER_NAME>
     ```
 
-4. Now you can add a Load Balancer connected to the Cluster and allow external traffic on two different ways:
+5. Now you can add a Load Balancer connected to the Cluster and allow external traffic on two different ways:
 
    - Using a Network Load Balancer + Elastic IPs (x2) + SSL:
      - Get your Elastic IPs following the instructions in [elastic-ip](elastic-ip) folder.
@@ -67,3 +69,5 @@ with the following services:
 - https://aws.amazon.com/es/blogs/opensource/network-load-balancer-nginx-ingress-controller-eks/
 - https://kind.sigs.k8s.io/docs/user/ingress/
 - https://github.com/jet/kube-webhook-certgen
+- https://blog.gruntwork.io/how-to-manage-terraform-state-28f5697e68fa
+- https://www.terraform.io/docs/language/settings/backends/s3.html

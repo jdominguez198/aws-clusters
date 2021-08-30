@@ -41,3 +41,7 @@ variable "ELASTIC_IP_NAME" {
 variable "GA_NAME" {
   default = "k8s-aws-gaip"
 }
+
+variable "STATE_BUCKET_PREFIX" {
+  default = "prefix"
+}

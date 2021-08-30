@@ -1,0 +1,8 @@
+terraform {
+  backend "s3" {
+    bucket = "${STATE_BUCKET_PREFIX}-k8s-aws-terraform-state"
+    key = "${STATE_BUCKET_PREFIX}/${TF_SERVICE}/terraform.tfstate"
+    region = "${ZONE}"
+    encrypt = true
+  }
+}
