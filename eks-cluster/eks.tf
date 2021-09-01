@@ -8,17 +8,14 @@ module "eks" {
   enable_irsa = true
   create_eks = true
 
-  node_groups_defaults = {
-    ami_type  = "AL2_x86_64"
-    disk_size = 20
-  }
-
   node_groups = {
     "${var.EKS_CLUSTER_NAME}_ng_01" = {
       desired_capacity = local.eks_node_group_min
       min_capacity = local.eks_node_group_min
       max_capacity = local.eks_node_group_max
-      instance_types = [local.vpc_node_group_instance_type.01]
+      instance_types = [local.vpc_node_group_instance_types["01_${local.vpc_node_group_instance_type}"].type]
+      ami_type = local.vpc_node_group_instance_types["01_${local.vpc_node_group_instance_type}"].ami
+      disk_size = local.vpc_node_group_instance_types["01_${local.vpc_node_group_instance_type}"].disk
       eni_delete = true
 
       additional_tags = {
@@ -33,7 +30,7 @@ module "eks" {
       name = "default"
       selectors = [
         {
-          namespace = "default"
+          namespace = "fargate"
         }
       ]
     }

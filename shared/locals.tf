@@ -17,9 +17,19 @@ locals {
 
   subnet_gateway_cidr_block = "172.16.0.0/16"
 
-  vpc_node_group_instance_type = {
-    01 = "t3.small"
+  vpc_node_group_instance_types = {
+    "01_x86" = {
+      type = "t3.small"
+      ami = "AL2_x86_64"
+      disk = 20
+    }
+    "01_ARM" = {
+      type = "t4g.small"
+      ami = "AL2_ARM_64"
+      disk = 20
+    }
   }
+  vpc_node_group_instance_type = "x86"
 
   eks_node_group_min = 1
   eks_node_group_max = 10
