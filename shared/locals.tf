@@ -1,5 +1,5 @@
 locals {
-  // eks-cluster related
+  // vpc common
   subnets = {
     01 = {
       private_cidr_block = "172.16.0.0/20"
@@ -17,6 +17,7 @@ locals {
 
   subnet_gateway_cidr_block = "172.16.0.0/16"
 
+  // eks-cluster related
   vpc_node_group_instance_types = {
     "01_x86" = {
       type = "t3.small"
@@ -54,4 +55,18 @@ locals {
   component_admission_webhook_labels = {
     "app.kubernetes.io/component" = "admission-webhook"
   }
+
+  // ecs-cluster related
+  ecs_proxy_name = "proxy"
+  ecs_lb_target_port = 80
+  ecs_lb_target_protocol = "TCP"
+  ecs_service_image = "nginx:latest"
+  ecs_service_port = 80
+  ecs_proxy_task_cpu = "256"
+  ecs_proxy_task_memory = "512"
+  ecs_proxy_autoscaler_min_tasks = 1
+  ecs_proxy_autoscaler_max_tasks = 3
+  ecs_proxy_autoscaler_cpu_average = 20
+  ecs_proxy_autoscaler_memory_average = 20
+
 }

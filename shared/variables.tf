@@ -6,6 +6,10 @@ variable "EKS_CLUSTER_NAME" {
   default = "k8s_aws"
 }
 
+variable "ECS_CLUSTER_NAME" {
+  default = "ecs_aws"
+}
+
 variable "ZONE" {
   default = "eu-west-1"
 }
