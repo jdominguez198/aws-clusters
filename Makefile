@@ -1,5 +1,6 @@
 ZONE ?= $(shell bash -c 'read -p "Region zone ID [eu-west-1]: " region_zone; [[ ! -z "$$region_zone" ]] && echo $$region_zone || echo "eu-west-1"')
-EKS_CLUSTER_NAME ?= $(shell bash -c 'read -p "Cluster name [k8s_aws]: " cluster_name; [[ ! -z "$$cluster_name" ]] && echo $$cluster_name || echo "k8s_aws"')
+EKS_CLUSTER_NAME ?= $(shell bash -c 'read -p "EKS Cluster name [k8s_aws]: " eks_cluster_name; [[ ! -z "$$eks_cluster_name" ]] && echo $$eks_cluster_name || echo "k8s_aws"')
+ECS_CLUSTER_NAME ?= $(shell bash -c 'read -p "ECS Cluster name [ecs_aws]: " ecs_cluster_name; [[ ! -z "$$ecs_cluster_name" ]] && echo $$ecs_cluster_name || echo "ecs_aws"')
 PREFIX ?= $(shell bash -c 'read -p "Prefix for some resource identifiers [prefix]: " prefix; [[ ! -z "$$prefix" ]] && echo $$prefix || echo "prefix"')
 INGRESS_BACKEND_SERVICE_NAME ?= $(shell bash -c 'read -p "Ingress Backend Service name [nginx-example]: " ingress_service_name; [[ ! -z "$$ingress_service_name" ]] && echo $$ingress_service_name || echo "nginx-example"')
 INGRESS_BACKEND_SERVICE_PORT ?= $(shell bash -c 'read -p "Ingress Backend Service port [80]: " ingress_service_port; [[ ! -z "$$ingress_service_port" ]] && echo $$ingress_service_port || echo "80"')
@@ -20,6 +21,7 @@ STATE_BUCKET_PREFIX ?= $(shell bash -c 'read -p "Terraform State prefix [prefix]
 prompt_vars:
 	$(eval MAKE_ENV += \
 		STATE_BUCKET_PREFIX \
+		ECS_CLUSTER_NAME \
 		EKS_CLUSTER_NAME \
 		PREFIX \
 		ZONE \
@@ -29,6 +31,19 @@ prompt_vars:
 		GA_NAME \
 		ELASTIC_IP_NAME)
 	$(eval SHELL_EXPORT := $(foreach v,$(MAKE_ENV),$(v)='$($(v))' ))
+
+ecs-cluster/terraform.tfvars: prompt_vars
+	@echo
+	@echo Generating ecs-cluster/terraform.tfvars file...
+	@echo
+	@$(SHELL_EXPORT) envsubst < ecs-cluster/terraform.tfvars.template > ecs-cluster/terraform.tfvars
+
+ecs-cluster/terraform.tfstate.tf: prompt_vars
+	@echo
+	@echo Generating ecs-cluster/terraform.tfstate.tf file...
+	@echo
+	@$(SHELL_EXPORT) TF_SERVICE="ecs-cluster" \
+		envsubst < shared/terraform-tfstate.tf.template > ecs-cluster/terraform.tfstate.tf
 
 eks-cluster/terraform.tfvars: prompt_vars
 	@echo
@@ -102,6 +117,7 @@ s3-backend/terraform.tfvars: prompt_vars
 	@$(SHELL_EXPORT) envsubst < s3-backend/terraform.tfvars.template > s3-backend/terraform.tfvars
 
 initialize_state: \
+	ecs-cluster/terraform.tfstate.tf \
 	eks-cluster/terraform.tfstate.tf \
 	eks-alb-controller/terraform.tfstate.tf \
 	eks-nginx-controller/terraform.tfstate.tf \
@@ -111,6 +127,7 @@ initialize_state: \
 
 initialize_vars: \
 	s3-backend/terraform.tfvars \
+	ecs-cluster/terraform.tfvars \
 	eks-cluster/terraform.tfvars \
 	eks-alb-controller/terraform.tfvars \
 	eks-nginx-controller/terraform.tfvars \
@@ -124,6 +141,7 @@ initialize: initialize_state initialize_vars
 clean_state:
 	rm -rf \
 		eks-alb-controller/terraform.tfstate.tf \
+    	ecs-cluster/terraform.tfstate.tf \
     	eks-cluster/terraform.tfstate.tf \
     	eks-nginx-controller/terraform.tfstate.tf \
     	global-accelerator/terraform.tfstate.tf \
@@ -134,6 +152,7 @@ clean_vars:
 	rm -rf \
 		s3-backend/terraform.tfvars \
 		eks-alb-controller/terraform.tfvars \
+		ecs-cluster/terraform.tfvars \
 		eks-cluster/terraform.tfvars \
     	eks-nginx-controller/terraform.tfvars \
     	global-accelerator/terraform.tfvars \
