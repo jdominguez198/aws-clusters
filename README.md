@@ -1,5 +1,14 @@
 # Kubernetes Cluster in AWS
 
+## Table of contents
+- [Introduction](#introduction)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+  - [Create Cluster using EKS](#create-cluster-using-eks)
+  - [(Extra) Create Cluster using ECS](#extra-create-cluster-using-ecs)
+- [TO DO](#to-do)
+- [Resources](#resources)
+
 ## Introduction
 
 The goal of this repository is to understand how to use Terraform to create a cluster
@@ -13,6 +22,7 @@ with the following services:
 - TLS certificates for Load Balancer using ACM
 - Global static IP for Application Load Balancer using Global Accelerator
 - Elastic IPs as static IPs for Network Load Balancer
+- _EXTRA:_ Create an ECS Cluster with Elastic IPs and Network Load Balancer using FARGATE
 
 ## Prerequisites
 
@@ -28,15 +38,18 @@ with the following services:
    to operate correctly with each AWS service
 2. Follow the documentation in [s3-backend](s3-backend) folder to create a S3 Bucket to store the
    Terraform state
-3. Follow the documentation in [eks-cluster](eks-cluster) folder to create the EKS Cluster with
+
+### Create Cluster using EKS
+
+1. Follow the documentation in [eks-cluster](eks-cluster) folder to create the EKS Cluster with
    the required policies, roles and resources to start using k8s
-4. Export `kubeconfig` files to operate with `kubectl` by typing in your terminal:
+2. Export `kubeconfig` files to operate with `kubectl` by typing in your terminal:
 
     ```bash
     aws eks --region <YOUR_REGION> update-kubeconfig --name <YOUR_EKS_CLUSTER_NAME>
     ```
 
-5. Now you can add a Load Balancer connected to the Cluster and allow external traffic on two different ways:
+3. Now you can add a Load Balancer connected to the Cluster and allow external traffic on two different ways:
 
    - Using a Network Load Balancer + Elastic IPs (x2) + SSL:
      - Get your Elastic IPs following the instructions in [elastic-ip](elastic-ip) folder.
@@ -46,7 +59,20 @@ with the following services:
      - Get your Accelerator following the instructions in [global-accelerator](global-accelerator) folder.
      - Create the Application Load Balancer with SSL, following the instructions in
        [eks-alb-controller](eks-alb-controller) folder.
+
+### (Extra) Create Cluster using ECS
+
+1. Get your Elastic IPs following the instructions in [elastic-ip](elastic-ip) folder.
+2. Follow the documentation in [ecs-cluster](ecs-cluster) folder to create the ECS cluster with
+   the required policies, roles and resources to start using your containers.
+3. Now you'll have a cluster ready to use with `FARGATE` instances
      
+## TO DO
+
+- For `ecs-cluster`, include ACM and HTTPS listener
+- Improve folders README to describe an overview
+- Prepare each folder as private modules and include examples of its usage
+
 ## Resources
 
 - https://github.com/AJarombek/global-aws-infrastructure/blob/master/eks/main.tf
@@ -71,3 +97,9 @@ with the following services:
 - https://github.com/jet/kube-webhook-certgen
 - https://blog.gruntwork.io/how-to-manage-terraform-state-28f5697e68fa
 - https://www.terraform.io/docs/language/settings/backends/s3.html
+- https://github.com/rhythmictech/terraform-aws-nlb-ecs-task/
+- https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html
+- https://engineering.finleap.com/posts/2020-02-20-ecs-fargate-terraform/
+- https://aws.amazon.com/de/blogs/compute/task-networking-in-aws-fargate/
+- https://github.com/finleap/tf-ecs-fargate-tmpl/blob/master/ecs/main.tf
+- https://aws.amazon.com/es/blogs/developer/provision-aws-infrastructure-using-terraform-by-hashicorp-an-example-of-running-amazon-ecs-tasks-on-aws-fargate/
