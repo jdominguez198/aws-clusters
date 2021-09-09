@@ -57,7 +57,7 @@ locals {
   }
 
   // ecs-cluster related
-  ecs_proxy_name = "proxy"
+  ecs_proxy_name = "proxy-example"
   ecs_lb_target_port = 80
   ecs_lb_target_protocol = "TCP"
   ecs_service_image = "nginx:latest"

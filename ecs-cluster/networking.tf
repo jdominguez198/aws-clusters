@@ -14,6 +14,8 @@ module "vpc" {
   public_subnets = [ local.subnets.01.public_cidr_block, local.subnets.02.public_cidr_block ]
   enable_nat_gateway = true
   single_nat_gateway = true
+  enable_dns_hostnames = true
+  enable_dns_support = true
 
   manage_default_security_group  = true
   default_security_group_ingress = [
@@ -34,4 +36,9 @@ module "vpc" {
       ipv6_cidr_blocks = "::/0"
     }
   ]
+}
+
+resource "aws_service_discovery_private_dns_namespace" "ecs_discovery_service_namespace" {
+  name = "test"
+  vpc = module.vpc.vpc_id
 }

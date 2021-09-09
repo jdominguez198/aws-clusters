@@ -7,6 +7,9 @@ Create a ECS cluster in AWS using Terraform
 ## Prerequisites
 
 - Non-root AWS user with enough credentials
+- You should have a set of Elastic IPs first (you can do it following [Elastic IP](../elastic-ip) instructions). Then
+  use the name used to set the Terraform variable `ELASTIC_IP_NAME`.
+- You should use your own SSL certificates. Add `ssl_body`, `ssl_chain` and `ssl_key` under `certificates` folder.
 
 ## Getting Started
 

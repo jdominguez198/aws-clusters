@@ -25,10 +25,18 @@ module "nlb" {
 
   http_tcp_listeners = [
     {
-      port = local.ecs_lb_target_port
-      protocol = local.ecs_lb_target_protocol
+      port = 80
+      protocol = "TCP"
       target_group_index = 0
-      action_type = "forward"
+    }
+  ]
+
+  https_listeners = [
+    {
+      port = 443
+      protocol = "TLS"
+      target_group_index = 0
+      certificate_arn = aws_acm_certificate.acm_tls.arn
     }
   ]
 
