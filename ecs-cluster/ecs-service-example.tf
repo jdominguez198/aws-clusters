@@ -7,7 +7,34 @@ resource "aws_ecs_task_definition" "example_task" {
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn = aws_iam_role.ecs_task_ssm_role.arn
 
-  container_definitions = file("./task-definitions/proxy-example.json")
+  container_definitions = jsonencode([
+    {
+      name = local.ecs_proxy_name
+      image = local.ecs_service_image
+      essential = true
+      networkMode = "awsvpc"
+      enableExecuteCommand = true,
+      readonlyRootFilesystem = false,
+      linuxParameters = {
+        "initProcessEnabled" = true
+      }
+      portMappings = [
+        {
+          protocol = lower(local.ecs_lb_target_protocol),
+          containerPort = local.ecs_service_port,
+          hostPort = local.ecs_service_port
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          awslogs-region = var.ZONE,
+          awslogs-group = "${module.ecs.ecs_cluster_name}-logs",
+          awslogs-stream-prefix = "complete-ecs"
+        }
+      }
+    }
+  ])
 }
 
 resource "aws_security_group" "example_task_sg" {
@@ -16,8 +43,8 @@ resource "aws_security_group" "example_task_sg" {
 
   ingress {
     protocol = "tcp"
-    from_port = 80
-    to_port = 80
+    from_port = local.ecs_service_port
+    to_port = local.ecs_service_port
     cidr_blocks = ["0.0.0.0/0"]
   }
 

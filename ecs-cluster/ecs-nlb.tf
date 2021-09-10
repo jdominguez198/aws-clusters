@@ -42,7 +42,7 @@ module "nlb" {
 
   target_groups = [
     {
-      name_prefix = "h1"
+      name = "${replace(module.ecs.ecs_cluster_name, "_", "-")}-nlb-tg-h1"
       backend_protocol = local.ecs_lb_target_protocol
       backend_port = local.ecs_lb_target_port
       target_type = "ip"
