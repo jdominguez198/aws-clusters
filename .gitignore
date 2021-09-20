@@ -6,6 +6,8 @@
 out
 gen
 
+.vscode
+
 # Terraform files
 **/.terraform/*
 .terraform.lock.hcl

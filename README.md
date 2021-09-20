@@ -1,18 +1,18 @@
-# Kubernetes Cluster in AWS
+# AWS Clusters modules & deployments
 
 ## Table of contents
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
-  - [Create Cluster using EKS](#create-cluster-using-eks)
-  - [(Extra) Create Cluster using ECS](#extra-create-cluster-using-ecs)
-- [TO DO](#to-do)
+  - [Modules](#modules)
+  - [Samples](#samples)
 - [Resources](#resources)
 
 ## Introduction
 
-The goal of this repository is to understand how to use Terraform to create a cluster
-with the following services:
+This repository contains multiple approaches to build and deploy Clusters in AWS, using ECS & EKS services.
+
+As part of the approaches, you can get the following services usages:
 
 - Cluster using EKS service
 - Node groups with EC2 provisioning
@@ -22,7 +22,7 @@ with the following services:
 - TLS certificates for Load Balancer using ACM
 - Global static IP for Application Load Balancer using Global Accelerator
 - Elastic IPs as static IPs for Network Load Balancer
-- _EXTRA:_ Create an ECS Cluster with Elastic IPs and Network Load Balancer using FARGATE
+- ECS Cluster with Elastic IPs and Network Load Balancer using FARGATE
 
 ## Prerequisites
 
@@ -34,44 +34,27 @@ with the following services:
 
 ## Getting started
 
-1. Run `make intitialize` to create all the `terraform.tfvars` files with the required variables
-   to operate correctly with each AWS service
-2. Follow the documentation in [s3-backend](s3-backend) folder to create a S3 Bucket to store the
-   Terraform state
+### Modules
 
-### Create Cluster using EKS
+- [ECS Cluster](modules/ecs-cluster) => Create a Cluster using ECS service with a Network Load Balancer for connect
+  a pair of Elastic IPs to be used in an external DNS
+- [EKS Cluster](modules/eks-cluster) => Create a Cluster using EKS service (Kubernetes) with EC2 node pool and a
+  Fargate profile to be used in combination of an Application Load Balancer or a Network Load Balancer
+- [EKS Application Load Balancer](modules/eks-alb-controller) => Create an Application Load Balancer to allow public
+  traffic to access the EKS cluster as an Ingress, using Global Accelerator to expose the public IPs
+- [Global Accelerator](modules/global-accelerator) => Create an Accelerator using the Global Accelerator service to
+  create a pair of Public IPs with high availability and AnyCast replication
+- [EKS Network Load Balancer](modules/eks-nginx-controller) => Create a Network Load Balancer to allow public traffic
+  to access the EKS cluster, using a pair of Elastic IPs. The Ingress used is a NGINX Controller
+- [Elastic IPs](modules/elastic-ip) => Create a pair of Public IPs to connect an ECS or EKS cluster to external traffic
 
-1. Follow the documentation in [eks-cluster](eks-cluster) folder to create the EKS Cluster with
-   the required policies, roles and resources to start using k8s
-2. Export `kubeconfig` files to operate with `kubectl` by typing in your terminal:
-
-    ```bash
-    aws eks --region <YOUR_REGION> update-kubeconfig --name <YOUR_EKS_CLUSTER_NAME>
-    ```
-
-3. Now you can add a Load Balancer connected to the Cluster and allow external traffic on two different ways:
-
-   - Using a Network Load Balancer + Elastic IPs (x2) + SSL:
-     - Get your Elastic IPs following the instructions in [elastic-ip](elastic-ip) folder.
-     - Create the Network Load Balancer with NGINX Controller and SSL, following the instructions in
-       [eks-nginx-controller](eks-nginx-controller) folder.
-   - Using an Application Load Balancer + Global Accelerator + SSL:
-     - Get your Accelerator following the instructions in [global-accelerator](global-accelerator) folder.
-     - Create the Application Load Balancer with SSL, following the instructions in
-       [eks-alb-controller](eks-alb-controller) folder.
-
-### (Extra) Create Cluster using ECS
-
-1. Get your Elastic IPs following the instructions in [elastic-ip](elastic-ip) folder.
-2. Follow the documentation in [ecs-cluster](ecs-cluster) folder to create the ECS cluster with
-   the required policies, roles and resources to start using your containers.
-3. Now you'll have a cluster ready to use with `FARGATE` instances
-     
-## TO DO
-
-- For `ecs-cluster`, include ACM and HTTPS listener
-- Improve folders README to describe an overview
-- Prepare each folder as private modules and include examples of its usage
+### Samples
+- [ECS Cluster with a Web Server](samples/sample-ecs-cluster-with-nginx) => Create an ECS Cluster with an example of a
+  NGINX proxy service to serve a Web
+- [EKS Cluster with Application Load Balancer](samples/sample-eks-cluster-with-alb-and-ga) => Create an EKS Cluster
+  with an Application Load Balancer and a Global Accelerator to create a Kubernetes cluster ready for production usage
+- [EKS Cluster with Network Load Balancer](samples/sample-eks-cluster-with-alb-and-ga) => Create an EKS Cluster
+  with a Network Load Balancer and a pair of Elastic IPs to create a Kubernetes cluster ready for production usage
 
 ## Resources
 
